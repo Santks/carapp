@@ -4,6 +4,8 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-material.css";
 import { Button } from "@mui/material";
 import { Snackbar } from "@mui/material";
+import AddCar from "./AddCar";
+import EditCar from "./EditCar";
 
 function Carlist() {
 
@@ -20,13 +22,17 @@ function Carlist() {
         { field: "price" },
         {
             field: "Actions",
+            cellRenderer: row => <EditCar car={row.data} updateCar={updateCar} />,
+        },
+        {
             cellRenderer: params =>
                 <Button color="error" onClick={() => {
                     deleteCar(params)
                 }}  >
                     Delete
                 </Button>
-        }
+        },
+
     ]
 
     useEffect(() => getCars(), [])
@@ -56,8 +62,43 @@ function Carlist() {
             .catch(error => console.error(error))
     }
 
+    const addCar = (car) => {
+        //REST API call
+        alert("Adding car to database")
+        fetch(rest_url, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(car)
+        })
+            .then(response => {
+                if (response.ok)
+                    getCars();
+                else
+                    alert("Something went wrong while trying to add new car")
+            })
+            .catch(err => console.error(err))
+    }
+
+    const updateCar = (car, rest_url) => {
+        //REST API call
+        alert("Car updated")
+        fetch(rest_url, {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(car)
+        })
+            .then(response => {
+                if (response.ok)
+                    getCars();
+                else
+                    alert("Something went wrong while trying to update car")
+            })
+            .catch(err => console.error(err))
+    }
+
     return (
         <>
+            <AddCar addCar={addCar} />
             <div className="ag-theme-material"
                 style={{ height: "700px", width: "95%", margin: "auto" }}>
                 <AgGridReact
